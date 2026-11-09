@@ -1,0 +1,31 @@
+name: CI & Anti-Drift Gate
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  typecheck-and-build:
+    name: QA Gate — TypeScript & Vite Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js LTS
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Gate 3 — TypeScript Strict Contract Check
+        run: npx tsc --noEmit
+
+      - name: Production Build Check
+        run: npm run build
+
